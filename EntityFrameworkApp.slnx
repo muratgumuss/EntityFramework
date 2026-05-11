@@ -1,3 +1,5 @@
 <Solution>
+  <Project Path="EFCore.CodeFirst/EFCore.CodeFirst.csproj" Id="3eae172c-8668-44cd-998c-771318d59251" />
   <Project Path="EFCore.DatabaseFirst/EFCore.DatabaseFirst.csproj" />
+  <Project Path="EFCore.DatabaseFirstByScaffold/EFCore.DatabaseFirstByScaffold.csproj" Id="82bfab01-4a1c-40c9-ab62-2805b3c47170" />
 </Solution>
