@@ -34,8 +34,31 @@ namespace EFCore.CodeFirst.DAL
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            //Fluent api kullanarak tablo isimlerini değiştirebiliriz.
+            //modelBuilder.Entity<Product>().ToTable("TblProducts");
 
+            //Fluent api kullanarak kolon isimlerini değiştirebiliriz.
+            //modelBuilder.Entity<Product>().HasKey(p => p.Id);
+
+            //Fluent api kullanarak kolon özelliklerini değiştirebiliriz.
+            modelBuilder.Entity<Product>().Property(p => p.Name).IsRequired();
             base.OnModelCreating(modelBuilder);
+        }
+
+        public override int SaveChanges()
+        {
+            ChangeTracker.Entries().ToList().ForEach(e =>
+            {
+                if (e.Entity is Product p)
+                {
+                    if (e.State == EntityState.Added)
+                    {
+                        p.CreatedDate = DateTime.Now;
+                    }
+                }
+            });
+
+            return base.SaveChanges();
         }
     }
 }
