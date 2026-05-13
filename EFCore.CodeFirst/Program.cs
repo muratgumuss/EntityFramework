@@ -3,6 +3,10 @@ using Microsoft.EntityFrameworkCore;
 
 using (var context = new AppDbContext())
 {
+    var category = new Category()
+    {
+        Name = "Telefon"
+    };
     var newProduct = new Product
     {
         Name = "Iphone 15 Pro Max",
@@ -10,10 +14,29 @@ using (var context = new AppDbContext())
         DiscountPrice = 25000,
         Stock = 100,
         Barcode = 123456789,
-        CategoryId = 1
+        Category = category
+
+    };
+    context.Products.Add(newProduct);
+    context.SaveChanges();
+
+    var category2 = new Category()
+    {
+        Name = "Bilgisayar"
     };
 
-    var product = await context.Products.FirstOrDefaultAsync(p => p.Id == 10);
+    category2.Products.Add(new Product
+    {
+        Name = "Macbook Pro M2",
+        Price = 40000,
+        DiscountPrice = 35000,
+        Stock = 50,
+        Barcode = 987654321
+    });
+    context.Categories.Add(category2);
+    context.SaveChanges();
+
+    var product = await context.Products.FirstOrDefaultAsync(p => p.Id == 1);
 
     Console.WriteLine($"Before Adding - State: {context.Entry(newProduct).State}");
     //await context.AddAsync(newProduct);

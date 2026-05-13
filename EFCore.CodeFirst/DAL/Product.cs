@@ -31,6 +31,8 @@ namespace EFCore.CodeFirst.DAL
         public bool IsDeleted { get; set; }
         public DateTime? CreatedDate { get; set; }
 
+        //navigation property
+        [ForeignKey("CategoryId")]
         public virtual Category Category { get; set; }
 
         public virtual ProductFeature ProductFeature { get; set; }
