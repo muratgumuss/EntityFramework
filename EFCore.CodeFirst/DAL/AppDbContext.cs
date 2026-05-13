@@ -16,11 +16,11 @@ namespace EFCore.CodeFirst.DAL
 
         public DbSet<Product> Products { get; set; }
         public DbSet<Category> Categories { get; set; }
-        //public DbSet<ProductFeature> productFeatures { get; set; }
+        public DbSet<ProductFeature> productFeatures { get; set; }
 
-        //public DbSet<Person> People { get; set; }
-        //public DbSet<Student> Students { get; set; }
-        //public DbSet<Teacher> Teachers { get; set; }
+        public DbSet<Person> People { get; set; }
+        public DbSet<Student> Students { get; set; }
+        public DbSet<Teacher> Teachers { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
 
@@ -42,7 +42,28 @@ namespace EFCore.CodeFirst.DAL
 
             //Fluent api kullanarak kolon özelliklerini değiştirebiliriz.
             modelBuilder.Entity<Product>().Property(p => p.Name).IsRequired();
+
+            //Fluent api kullanarak ilişkileri tanımlayabiliriz.
+            modelBuilder.Entity<Category>().HasMany(c => c.Products).WithOne(p => p.Category).HasForeignKey(p => p.CategoryId);
             base.OnModelCreating(modelBuilder);
+
+            // one to many
+            modelBuilder.Entity<Category>()
+                .HasMany(c => c.Products)
+                .WithOne(p => p.Category)
+                .HasForeignKey(p => p.CategoryId);
+
+            // one to one
+            modelBuilder.Entity<Product>()
+                .HasOne(p => p.ProductFeature)
+                .WithOne(pf => pf.Product)
+                .HasForeignKey<ProductFeature>(pf => pf.Id);
+
+            // many to many
+            modelBuilder.Entity<Student>()
+                .HasMany(s => s.Teachers)
+                .WithMany(t => t.Students)
+                .UsingEntity(j => j.ToTable("StudentTeacherManyToMany"));
         }
 
         public override int SaveChanges()
