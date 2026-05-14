@@ -8,6 +8,8 @@ namespace EFCore.CodeFirst.DAL
     //[Table("Products")]
     public class Product
     {
+        // None -- Id property'sinin değerini manuel olarak gireceğimiz anlamına gelir. Veritabanı bu değeri otomatik olarak oluşturmaz.
+        //[DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int Id { get; set; }
 
         //Solution Nullable Reference Types özelliği açık olduğu için string türündeki Name property'si nullable olarak tanımlanmıştır.
@@ -29,6 +31,11 @@ namespace EFCore.CodeFirst.DAL
         public int CategoryId { get; set; }
 
         public bool IsDeleted { get; set; }
+
+        // Data Annotations kullanarak oluşturulma tarihini otomatik olarak ekleyebiliriz. Update yaparken bu kolonun güncellenmesini engelleyebiliriz.
+        //[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        // Computed -- veritabanında oluşturulma tarihini otomatik olarak ekleyebiliriz. Update yaparken bu kolonun güncellenmesini engelleyebiliriz.
+        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public DateTime? CreatedDate { get; set; }
 
         //navigation property

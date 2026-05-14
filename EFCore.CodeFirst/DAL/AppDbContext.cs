@@ -64,6 +64,43 @@ namespace EFCore.CodeFirst.DAL
                 .HasMany(s => s.Teachers)
                 .WithMany(t => t.Students)
                 .UsingEntity(j => j.ToTable("StudentTeacherManyToMany"));
+
+            // cascade delete -- bir kategoriyi silerken o kategoriye ait ürünlerinde silinmesini sağlar.
+            modelBuilder.Entity<Category>()
+                .HasMany(c => c.Products)
+                .WithOne(p => p.Category)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // restrict delete -- bir kategoriyi silerken o kategoriye ait ürünlerin silinmesini engeller.
+            modelBuilder.Entity<Category>()
+                .HasMany(c => c.Products)
+                .WithOne(p => p.Category)
+                .OnDelete(DeleteBehavior.Restrict);
+            // no action delete -- bir kategoriyi silerken o kategoriye ait ürünlerin silinmesini engeller ve hata vermez.
+            modelBuilder.Entity<Category>()
+                .HasMany(c => c.Products)
+                .WithOne(p => p.Category)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            // set null delete -- bir kategoriyi silerken o kategoriye ait ürünlerin CategoryId kolonunu null yapar.
+            modelBuilder.Entity<Category>()
+                .HasMany(c => c.Products)
+                .WithOne(p => p.Category)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            // computed column -- veritabanında oluşturulma tarihini otomatik olarak ekleyebiliriz. Update yaparken bu kolonun güncellenmesini engelleyebiliriz.
+            modelBuilder.Entity<Product>()
+                .Property(p => p.CreatedDate)
+                .HasComputedColumnSql("GETDATE()");
+            // none -- Id property'sinin değerini manuel olarak gireceğimiz anlamına gelir. Veritabanı bu değeri otomatik olarak oluşturmaz.
+            //modelBuilder.Entity<Product>().
+            //    Property(p => p.Id)
+            //    .ValueGeneratedOnAdd();
+
+            // Identity -- Id property'sinin değerini veritabanının otomatik olarak oluşturacağı anlamına gelir.
+            //modelBuilder.Entity<Product>()
+            //    .Property(p => p.Id)
+            //    .ValueGeneratedOnAdd();
         }
 
         public override int SaveChanges()
