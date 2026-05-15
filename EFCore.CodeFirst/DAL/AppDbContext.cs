@@ -23,13 +23,8 @@ namespace EFCore.CodeFirst.DAL
         public DbSet<Teacher> Teachers { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-
-
             Initializer.Build();
-            optionsBuilder.LogTo(Console.WriteLine, Microsoft.Extensions.Logging.LogLevel.Information).UseSqlServer(Initializer.Configuration.GetConnectionString("SqlCon"));
-
-
-
+            optionsBuilder.LogTo(Console.WriteLine, Microsoft.Extensions.Logging.LogLevel.Information).UseLazyLoadingProxies().UseSqlServer(Initializer.Configuration.GetConnectionString("SqlCon"));
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
