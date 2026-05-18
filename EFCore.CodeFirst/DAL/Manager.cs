@@ -1,7 +1,13 @@
-﻿namespace EFCore.CodeFirst.DAL
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace EFCore.CodeFirst.DAL
 {
-    public class Manager : BasedPerson
+    [Owned]
+    public class Manager 
     {
+        public int Id { get; set; }
         public int Grade { get; set; }
+
+        public virtual BasedPerson People { get; set; }
     }
 }
