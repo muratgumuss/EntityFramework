@@ -18,16 +18,18 @@ namespace EFCore.CodeFirst.DAL
         public DbSet<Category> Categories { get; set; }
         public DbSet<ProductFeature> productFeatures { get; set; }
 
-        public DbSet<Person> People { get; set; }
+        public DbSet<Person> Person { get; set; }
         public DbSet<Student> Students { get; set; }
         public DbSet<Teacher> Teachers { get; set; }
 
         // TPH (Table Per Hierarchy) -- miras alınan sınıfların tek bir tabloda tutulmasıdır.
         // Discriminator kolonu ile hangi sınıfa ait olduğunu belirleriz.
         // TPT (Table Per Type) -- miras alınan sınıfların ayrı tablolarda tutulmasıdır. Tablolar arasında ilişki kurulur.
-        public DbSet<BasedPerson> BasedPeople { get; set; }
+        //public DbSet<BasedPerson> BasedPeople { get; set; }
         public DbSet<Manager> Manager { get; set; }
         public DbSet<Employee> Employees { get; set; }
+
+        public DbSet<ProductFull> ProductFulls { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -104,6 +106,19 @@ namespace EFCore.CodeFirst.DAL
             //modelBuilder.Entity<Product>()
             //    .Property(p => p.Id)
             //    .ValueGeneratedOnAdd();
+
+            // Keyless -- ProductFull sınıfının birincil anahtarı olmadığını belirtir. Genellikle veritabanında bir tabloya karşılık gelmeyen,
+            modelBuilder.Entity<ProductFull>().HasNoKey();
+
+            // NotMapped -- Barcode property’sinin veritabanında bir kolona karşılık gelmediğini belirtir.
+            // Yani, bu property veritabanında oluşturulmaz ve sorgulanmaz. Sadece uygulama içinde kullanılır.
+            modelBuilder.Entity<Product>().Ignore(p => p.Barcode);
+
+            // unicode -- Unicode karakterleri destekleyen bir string türü olduğunu belirtir. Bu, veritabanında bu kolona Unicode karakterlerin saklanabileceği anlamına gelir. Eğer Unicode karakter desteği istemiyorsanız,
+            modelBuilder.Entity<Product>().Property(p => p.Name).IsUnicode(false);
+
+            // kolon tipini değiştirebiliriz. Bu örnekte Name kolonunu varchar(100) olarak belirledik. Varsayılan olarak string türündeki kolonlar nvarchar olarak oluşturulur.
+            modelBuilder.Entity<Product>().Property(p => p.Name).HasColumnType("varchar(100)");
         }
 
         public override int SaveChanges()

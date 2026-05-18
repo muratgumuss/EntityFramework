@@ -14,6 +14,10 @@ namespace EFCore.CodeFirst.DAL
 
         //Solution Nullable Reference Types özelliği açık olduğu için string türündeki Name property'si nullable olarak tanımlanmıştır.
         //Bu, Name property'sinin null değer alabileceği anlamına gelir. Eğer Name property'sinin null olmasını istemiyorsanız, nullable olmayan bir string türü kullanabilirsiniz:
+        // Unicode -- Unicode karakterleri destekleyen bir string türü olduğunu belirtir. Bu, veritabanında bu kolona Unicode karakterlerin saklanabileceği anlamına gelir. Eğer Unicode karakter desteği istemiyorsanız,
+        // Unicode(false) olarak belirtebilirsiniz. vchar olarak saklanır. Unicode(true) olarak belirtebilirsiniz. nvarchar olarak saklanır.
+        [Unicode(false)]
+        [Column(TypeName = "varchar(100)")] // kolon tipini değiştirebiliriz. Bu örnekte Name kolonunu varchar(100) olarak belirledik. Varsayılan olarak string türündeki kolonlar nvarchar olarak oluşturulur.
         public string? Name { get; set; }
         // #######.##
         [Precision(9, 2)]
@@ -26,6 +30,9 @@ namespace EFCore.CodeFirst.DAL
         //[Column("StockAmount")]
         public int Stock { get; set; }
 
+        // NotMapped -- Bu property’nin veritabanında bir kolona karşılık gelmediğini belirtir. Yani, bu property veritabanında oluşturulmaz ve sorgulanmaz. Sadece uygulama içinde kullanılır.
+        // Örneğin, Barcode property’si veritabanında bir kolona karşılık gelmez, sadece uygulama içinde kullanılır.
+        //[NotMapped]
         public int Barcode { get; set; }
 
         public int CategoryId { get; set; }

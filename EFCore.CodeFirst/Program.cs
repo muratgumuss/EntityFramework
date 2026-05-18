@@ -146,7 +146,10 @@ using (var context = new AppDbContext())
 
     // Tbh örneği -- bir kategoriyi çektiğimizde o kategoriye ait ürünlerin gelmesini sağlar. Ancak, her ürün için ayrı bir sorgu atılır. Bu da performans sorunlarına yol açar.
 
-    var employees = await context.Employees.ToListAsync();
+    //var employees = await context.Employees.ToListAsync();
+
+    var productFulls = context.ProductFulls.FromSqlRaw(@"SELECT p.Id AS Product_Id, p.Name, p.Price, c.Name AS CategoryName, p.Stock 
+    FROM Products p INNER JOIN Categories c ON p.CategoryId = c.Id").ToList();
 
 
 }
