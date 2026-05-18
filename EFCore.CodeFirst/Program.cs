@@ -44,7 +44,7 @@ using (var context = new AppDbContext())
     //context.Remove(product);
     await context.SaveChangesAsync();
     Console.WriteLine($"After Adding - State: {context.Entry(newProduct).State}");
-    
+
 
     Console.WriteLine($"After Save - State: {context.Entry(newProduct).State}");
 
@@ -58,13 +58,14 @@ using (var context = new AppDbContext())
 
     context.ChangeTracker.Entries().ToList().ForEach(e =>
     {
-        if(e.Entity is Product p)
+        if (e.Entity is Product p)
         {
             Console.WriteLine($"Id: {p.Id} - Name: {p.Name} - Price: {p.Price} - State: {e.State}");
         }
-    }); 
+    });
 
-    context.Products.Add(new Product     {
+    context.Products.Add(new Product
+    {
         Name = "Iphone 15 Pro Max",
         Price = 30000,
         DiscountPrice = 25000,
@@ -93,10 +94,12 @@ using (var context = new AppDbContext())
         .ToListAsync();
 
     // explicit loading -- bir kategoriyi çektiğimizde o kategoriye ait ürünlerin gelmesini sağlar. Load metodu
-    context.Entry(category).Collection(c => c.Products).Load(); 
+    context.Entry(category).Collection(c => c.Products).Load();
 
-    category.Products.ForEach(p => { 
-    Console.WriteLine($"Id: {p.Id} - Name: {p.Name} - Price: {p.Price}"); } );
+    category.Products.ForEach(p =>
+    {
+        Console.WriteLine($"Id: {p.Id} - Name: {p.Name} - Price: {p.Price}");
+    });
 
     // lazy loading -- bir kategoriyi çektiğimizde o kategoriye ait ürünlerin gelmesini sağlar.
     // virtual keywordü ile lazy loading özelliğini aktif ederiz. Lazy loading özelliği aktif olduğunda,
@@ -136,7 +139,14 @@ using (var context = new AppDbContext())
     // n+1 çözümü -- bir kategoriyi çektiğimizde o kategoriye ait ürünlerin gelmesini sağlar. Ancak, her ürün için ayrı bir sorgu atılır.
     // Bu da performans sorunlarına yol açar. Bunu çözmek için eager loading kullanabiliriz.
     var categoriesLazyLoading = await context.Categories.ToListAsync();
-    categoriesLazyLoading.ForEach(category => {
+    categoriesLazyLoading.ForEach(category =>
+    {
         var products = category.Products;
-    }); 
+    });
+
+    // Tbh örneği -- bir kategoriyi çektiğimizde o kategoriye ait ürünlerin gelmesini sağlar. Ancak, her ürün için ayrı bir sorgu atılır. Bu da performans sorunlarına yol açar.
+
+    var employees = await context.Employees.ToListAsync();
+
+
 }
