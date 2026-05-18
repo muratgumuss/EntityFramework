@@ -21,6 +21,14 @@ namespace EFCore.CodeFirst.DAL
         public DbSet<Person> People { get; set; }
         public DbSet<Student> Students { get; set; }
         public DbSet<Teacher> Teachers { get; set; }
+
+        // TPH (Table Per Hierarchy) -- miras alınan sınıfların tek bir tabloda tutulmasıdır.
+        // Discriminator kolonu ile hangi sınıfa ait olduğunu belirleriz.
+        // TPT (Table Per Type) -- miras alınan sınıfların ayrı tablolarda tutulmasıdır. Tablolar arasında ilişki kurulur.
+        public DbSet<BasedPerson> BasedPeople { get; set; }
+        public DbSet<Manager> Manager { get; set; }
+        public DbSet<Employee> Employees { get; set; }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             Initializer.Build();
