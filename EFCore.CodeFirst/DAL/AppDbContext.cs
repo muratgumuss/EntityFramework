@@ -119,6 +119,22 @@ namespace EFCore.CodeFirst.DAL
 
             // kolon tipini değiştirebiliriz. Bu örnekte Name kolonunu varchar(100) olarak belirledik. Varsayılan olarak string türündeki kolonlar nvarchar olarak oluşturulur.
             modelBuilder.Entity<Product>().Property(p => p.Name).HasColumnType("varchar(100)");
+
+            // HasIndex -- Name kolonuna index ekler. Bu, Name kolonundaki verilere daha hızlı erişim sağlar. Ancak, index eklemek veritabanında ekstra depolama alanı kullanır ve veri ekleme, güncelleme ve silme işlemlerini yavaşlatabilir.
+            // IsUnique = true -- Name kolonundaki değerlerin benzersiz olmasını sağlar. Aynı değere sahip iki ürün eklenemez.
+            modelBuilder.Entity<Product>().HasIndex(p => p.Name).IsUnique();
+
+            // Name ve Price kolonlarına composite index ekler. Bu, Name ve Price kolonlarındaki verilere daha hızlı erişim sağlar. Ancak, index eklemek veritabanında ekstra depolama alanı kullanır ve veri ekleme, güncelleme ve silme işlemlerini yavaşlatabilir.
+            modelBuilder.Entity<Product>().HasIndex(p => new { p.Name, p.Price });
+
+            // IncludeProperties -- index oluştururken hangi kolonların indexe dahil edileceğini belirtir. Bu, indexin daha verimli kullanılmasını sağlar. Ancak, index eklemek veritabanında ekstra depolama alanı kullanır ve veri ekleme, güncelleme ve silme işlemlerini yavaşlatabilir.
+            modelBuilder.Entity<Product>().HasIndex(p =>p.Name).IncludeProperties(p => p.Price);
+
+            // Check Constraint -- Price kolonunun DiscountPrice kolonundan büyük olmasını sağlar. Bu, veritabanında veri bütünlüğünü sağlar. Ancak, check constraint eklemek veritabanında ekstra işlem yapar ve veri ekleme, güncelleme ve silme işlemlerini yavaşlatabilir.
+            // CK_Product_Price -- check constraint'in adıdır. [Price] > [DiscountPrice] -- check constraint'in koşuludur. Price kolonunun DiscountPrice kolonundan büyük olmasını sağlar.
+            // Check Constraint -- Price kolonunun DiscountPrice kolonundan büyük olmasını sağlar. Bu, veritabanında veri bütünlüğünü sağlar. Ancak, check constraint eklemek veritabanında ekstra işlem yapar ve veri ekleme, güncelleme ve silme işlemlerini yavaşlatabilir.
+            modelBuilder.Entity<Product>().HasCheckConstraint("CK_Product_Price", "[Price] > [DiscountPrice]");
+
         }
 
         public override int SaveChanges()

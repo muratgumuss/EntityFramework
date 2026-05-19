@@ -6,6 +6,13 @@ namespace EFCore.CodeFirst.DAL
 
     // Data Annotations kullanarak tablo ismini değiştirebiliriz.
     //[Table("Products")]
+    // Name kolonuna unique index ekler. Bu, Name kolonundaki değerlerin benzersiz olmasını sağlar. Aynı değere sahip iki ürün eklenemez.
+    // IsUnique = true -- Name kolonundaki değerlerin benzersiz olmasını sağlar. Aynı değere sahip iki ürün eklenemez.
+    // IsUnique = false -- Name kolonundaki değerlerin benzersiz olmasını engeller. Aynı değere sahip iki ürün eklenebilir.
+    // Index -- Name kolonuna index ekler. Bu, Name kolonundaki verilere daha hızlı erişim sağlar. Ancak, index eklemek veritabanında ekstra depolama alanı kullanır ve veri ekleme, güncelleme ve silme işlemlerini yavaşlatabilir.
+    [Index(nameof(Name), IsUnique = true)]
+    // Name ve Price kolonlarına composite index ekler. Bu, Name ve Price kolonlarındaki verilere daha hızlı erişim sağlar. Ancak, index eklemek veritabanında ekstra depolama alanı kullanır ve veri ekleme, güncelleme ve silme işlemlerini yavaşlatabilir.
+    [Index(nameof(Name), nameof(Price))]
     public class Product
     {
         // None -- Id property'sinin değerini manuel olarak gireceğimiz anlamına gelir. Veritabanı bu değeri otomatik olarak oluşturmaz.
