@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using EFCore.CodeFirst.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -30,6 +31,8 @@ namespace EFCore.CodeFirst.DAL
         public DbSet<Employee> Employees { get; set; }
 
         public DbSet<ProductFull> ProductFulls { get; set; }
+
+        public DbSet<ProductEssential> ProductEssentials { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -134,6 +137,10 @@ namespace EFCore.CodeFirst.DAL
             // CK_Product_Price -- check constraint'in adıdır. [Price] > [DiscountPrice] -- check constraint'in koşuludur. Price kolonunun DiscountPrice kolonundan büyük olmasını sağlar.
             // Check Constraint -- Price kolonunun DiscountPrice kolonundan büyük olmasını sağlar. Bu, veritabanında veri bütünlüğünü sağlar. Ancak, check constraint eklemek veritabanında ekstra işlem yapar ve veri ekleme, güncelleme ve silme işlemlerini yavaşlatabilir.
             modelBuilder.Entity<Product>().HasCheckConstraint("CK_Product_Price", "[Price] > [DiscountPrice]");
+
+
+            // Vw_ProductEssentials adında bir view oluşturduk. Bu view, Product tablosundaki Name ve Price kolonlarını içerir. ProductEssential sınıfı bu view'a karşılık gelir. Bu sınıfın birincil anahtarı olmadığını belirtmek için HasNoKey() metodunu kullanırız.
+            modelBuilder.Entity<ProductEssential>().ToView("Vw_ProductEssentials").HasNoKey();
 
         }
 
