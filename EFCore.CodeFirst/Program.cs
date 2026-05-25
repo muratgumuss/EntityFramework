@@ -314,7 +314,36 @@ using (var context = new AppDbContext())
 
     // ToView örneği -- toview, bir sorgunun sonucunu bir view olarak kaydetmenizi sağlar. Bu, sorgularınızın performansını artırabilir, çünkü view’lar veritabanında önceden hesaplanmış sonuçları saklar. Ancak, toview kullanırken view’ların güncellenmesi gerektiğini unutmayın, çünkü view’lar veritabanında saklandığı için veriler değiştiğinde view’ların da güncellenmesi gerekir.
     var toViewResult = await context.ProductEssentials.ToListAsync();
-  
+
+    // Pagenation - Take & Skip -- pagenation, büyük veri setlerini sayfalara bölerek kullanıcıya sunmanızı sağlar. Take metodu, belirli bir sayıda kayıt almanızı sağlar, Skip metodu ise belirli bir sayıda kaydı atlamanızı sağlar. Bu iki metodu birlikte kullanarak sayfalama yapabilirsiniz.
+    int pageSize = 10;
+    int pageNumber = 1;
+    var paginatedResult = await context.Products
+        .Skip((pageNumber - 1) * pageSize)
+        .Take(pageSize)
+        .ToListAsync();
+
+    // Global query filters -- global query filters, belirli bir koşula göre tüm sorgulara otomatik olarak uygulanan filtrelerdir. Örneğin, bir ürünün stokta olup olmadığını kontrol etmek için global query filter kullanabilirsiniz. Bu sayede, stokta olmayan ürünler sorgularınızda otomatik olarak filtrelenir ve kullanıcıya gösterilmez.
+    var productsWithGlobalFilter = await context.Products.ToListAsync();
+    // ignore query filters -- ignore query filters, global query filters’ı geçersiz kılarak sorgularınızda tüm kayıtları getirmenizi sağlar. Örneğin, stokta olmayan ürünleri de göstermek istediğinizde ignore query filters kullanabilirsiniz.
+    var productsWithoutGlobalFilter = await context.Products.IgnoreQueryFilters().ToListAsync();
+
+    // Query tags -- query tags, sorgularınıza açıklama eklemenizi sağlar. Bu açıklamalar, sorgularınızın veritabanında nasıl çalıştığını anlamanıza yardımcı olabilir. Ayrıca, query tags kullanarak sorgularınızı gruplandırabilir ve performans analizleri yapabilirsiniz.
+    var taggedQueryResult = await context.Products
+        .TagWith("This is a tagged query")
+        .Where(p => p.Price > 20000)
+        .ToListAsync();
+
+    // Global Tracking / No Tracking -- global tracking, tüm sorgularınızda değişiklik takibini etkinleştirir. Bu, sorgularınızın sonucunda dönen nesnelerin değişikliklerini takip etmenizi sağlar. No tracking ise, sorgularınızda değişiklik takibini devre dışı bırakır. Bu, sorgularınızın sonucunda dönen nesnelerin değişikliklerini takip etmenizi engeller ve performansı artırabilir.
+    var trackedProducts = await context.Products.ToListAsync();
+    var untrackedProducts = await context.Products.AsNoTracking().ToListAsync();
+
+
+
+
+
+
+
 
 
 

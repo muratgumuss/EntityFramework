@@ -37,7 +37,14 @@ namespace EFCore.CodeFirst.DAL
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             Initializer.Build();
-            optionsBuilder.LogTo(Console.WriteLine, Microsoft.Extensions.Logging.LogLevel.Information).UseLazyLoadingProxies().UseSqlServer(Initializer.Configuration.GetConnectionString("SqlCon"));
+            optionsBuilder.LogTo(Console.WriteLine, Microsoft.Extensions.Logging.LogLevel.Information)
+                .UseLazyLoadingProxies().UseSqlServer(Initializer.Configuration.GetConnectionString("SqlCon"));
+
+            // global tracking açmak için aşağıdaki kodu kullanabiliriz. Bu sayede, tüm sorgularda değişiklikleri takip ederiz. Ancak, performans sorunlarına yol açabilir.
+            //optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.TrackAll);
+            // global tracking kapatmak için aşağıdaki kodu kullanabiliriz. Bu sayede, tüm sorgularda değişiklikleri takip etmeyiz. Performans sorunlarını azaltır, ancak değişiklikleri takip etmek istediğimiz durumlarda sorunlara yol açabilir.
+            //optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -142,6 +149,13 @@ namespace EFCore.CodeFirst.DAL
             // Vw_ProductEssentials adında bir view oluşturduk. Bu view, Product tablosundaki Name ve Price kolonlarını içerir. ProductEssential sınıfı bu view'a karşılık gelir. Bu sınıfın birincil anahtarı olmadığını belirtmek için HasNoKey() metodunu kullanırız.
             modelBuilder.Entity<ProductEssential>().ToView("Vw_ProductEssentials").HasNoKey();
 
+            // Global query filters -- global query filters, belirli bir koşula göre tüm sorgulara otomatik olarak uygulanan filtrelerdir. Örneğin, bir ürünün stokta olup olmadığını kontrol etmek için global query filter kullanabilirsiniz. Bu sayede, stokta olmayan ürünler otomatik olarak sorgulardan hariç tutulur.
+            // Soft delete -- soft delete, bir kaydın veritabanından fizik
+            // multi tenancy -- multi tenancy, bir uygulamanın birden fazla müşteriye hizmet verebilmesini sağlar. Bu, her müşterinin verilerinin birbirinden izole edilmesini sağlar. Multi tenancy kullanarak, her müşterinin verilerini ayrı bir veritabanında saklayabilir veya aynı veritabanında farklı şemalar kullanarak saklayabilirsiniz.
+            // örnek: bir e-ticaret uygulamasında, her müşterinin ürünlerini ayrı bir veritabanında saklamak yerine, aynı veritabanında farklı şemalar kullanarak saklayabilirsiniz. Bu sayede, her müşterinin verileri birbirinden izole edilir ve güvenli bir şekilde saklanır.
+            // global query filter -- silinmiş ürünleri göstermemek için global query filter ekleyebiliriz. IsDeleted kolonunu kullanarak silinmiş ürünleri filtreleyebiliriz. Bu, tüm sorgularda geçerli olur ve silinmiş ürünlerin gösterilmesini engeller.
+            modelBuilder.Entity<Product>().Property(p => p.IsDeleted).HasDefaultValue(false);
+            modelBuilder.Entity<Product>().HasQueryFilter(p => !p.IsDeleted);
         }
 
         public override int SaveChanges()

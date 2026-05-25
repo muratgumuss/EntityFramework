@@ -57,5 +57,6 @@ namespace EFCore.CodeFirst.DAL
         public virtual Category Category { get; set; }
 
         public virtual ProductFeature ProductFeature { get; set; }
+
     }
 }
