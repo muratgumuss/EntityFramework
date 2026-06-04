@@ -156,6 +156,10 @@ namespace EFCore.CodeFirst.DAL
             // global query filter -- silinmiş ürünleri göstermemek için global query filter ekleyebiliriz. IsDeleted kolonunu kullanarak silinmiş ürünleri filtreleyebiliriz. Bu, tüm sorgularda geçerli olur ve silinmiş ürünlerin gösterilmesini engeller.
             modelBuilder.Entity<Product>().Property(p => p.IsDeleted).HasDefaultValue(false);
             modelBuilder.Entity<Product>().HasQueryFilter(p => !p.IsDeleted);
+
+            // stored procedure -- hasnokey -- stored procedure'ler genellikle bir tabloya karşılık gelmezler, bu yüzden HasNoKey() metodunu kullanarak bu durumu belirtiriz. Stored procedure'ler, veritabanında belirli bir işlemi gerçekleştirmek için kullanılan önceden tanımlanmış SQL kod bloklarıdır. Bu prosedürler, veritabanı performansını artırmak, veri bütünlüğünü sağlamak ve karmaşık işlemleri basitleştirmek için kullanılırlar.
+            modelBuilder.Entity<ProductFull>().HasNoKey().ToSqlQuery("EXEC GetProductFull");
+
         }
 
         public override int SaveChanges()
