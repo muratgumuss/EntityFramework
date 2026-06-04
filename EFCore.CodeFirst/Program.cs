@@ -338,8 +338,18 @@ using (var context = new AppDbContext())
     var trackedProducts = await context.Products.ToListAsync();
     var untrackedProducts = await context.Products.AsNoTracking().ToListAsync();
 
+    // Stored Procedures -- stored procedures, veritabanında önceden tanımlanmış SQL sorgularıdır. Bu sorgular, belirli bir işlemi gerçekleştirmek için kullanılır. EF Core’da stored procedures kullanarak veri çekebilir, ekleyebilir, güncelleyebilir ve silebilirsiniz. Ancak, stored procedures kullanırken performans sorunlarına dikkat etmelisiniz, çünkü bazı stored procedures veritabanında verimsiz çalışabilir.
+    var storedProcedureResult = await context.Products
+        .FromSqlRaw("EXEC sp_GetProductsByPrice @Price = {0}", 20000)
+        .ToListAsync();
 
 
+    // sp_insert_product stored procedure'ünü kullanarak yeni bir ürün ekleyelim. Bu stored procedure, ürünün adını, fiyatını ve kategori ID'sini parametre olarak alır ve yeni bir ürün ekler.
+    var newProductName = "Samsung Galaxy S23";
+    var newProductPrice = 25000;
+    var newProductCategoryId = 1;
+    await context.Database.ExecuteSqlRawAsync("EXEC sp_insert_product @Name = {0}, @Price = {1}, @CategoryId = {2}",
+        newProductName, newProductPrice, newProductCategoryId);
 
 
 
