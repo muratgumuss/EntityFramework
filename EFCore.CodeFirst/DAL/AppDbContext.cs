@@ -160,6 +160,13 @@ namespace EFCore.CodeFirst.DAL
             // stored procedure -- hasnokey -- stored procedure'ler genellikle bir tabloya karşılık gelmezler, bu yüzden HasNoKey() metodunu kullanarak bu durumu belirtiriz. Stored procedure'ler, veritabanında belirli bir işlemi gerçekleştirmek için kullanılan önceden tanımlanmış SQL kod bloklarıdır. Bu prosedürler, veritabanı performansını artırmak, veri bütünlüğünü sağlamak ve karmaşık işlemleri basitleştirmek için kullanılırlar.
             modelBuilder.Entity<ProductFull>().HasNoKey().ToSqlQuery("EXEC GetProductFull");
 
+            // function
+            modelBuilder.Entity<ProductEssential>().ToFunction("GetProductEssentials").HasNoKey();
+
+            // scalar valued function -- tek bir değer döndüren fonksiyonlardır. Örneğin, bir ürünün stok durumunu kontrol etmek için bir scalar valued function oluşturabilirsiniz. Bu fonksiyon, ürünün stokta olup olmadığını kontrol eder ve true veya false değerini döndürür.
+            modelBuilder.Entity<ProductEssential>().HasNoKey().ToSqlQuery("SELECT Id, Name, Price FROM dbo.GetProductEssentials()");
+
+
         }
 
         public override int SaveChanges()
