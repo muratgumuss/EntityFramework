@@ -1,4 +1,7 @@
-﻿using EFCore.CodeFirst.DAL;
+﻿using AutoMapper.QueryableExtensions;
+using EFCore.CodeFirst.DAL;
+using EFCore.CodeFirst.Dtos;
+using EFCore.CodeFirst.Mappers;
 using Microsoft.EntityFrameworkCore;
 
 using (var context = new AppDbContext())
@@ -367,7 +370,34 @@ using (var context = new AppDbContext())
 
     // scalar valued function -- scalar valued function, veritabanında tanımlı bir fonksiyonu EF Core’da bir değer olarak kullanmanızı sağlar. Bu, veritabanında tanımlı bir fonksiyonu LINQ sorgularınızda kullanarak veri çekmenizi sağlar. Ancak, scalar valued function kullanırken performans sorunlarına dikkat etmelisiniz, çünkü bazı fonksiyonlar veritabanında verimsiz çalışabilir.
 
+    // Anonymous type mapping -- anonymous type mapping, veritabanında tanımlı bir fonksiyonu EF Core’da anonim bir tür olarak kullanmanızı sağlar. Bu, veritabanında tanımlı bir fonksiyonu LINQ sorgularınızda kullanarak veri çekmenizi sağlar. Ancak, anonymous type mapping kullanırken performans sorunlarına dikkat etmelisiniz, çünkü bazı fonksiyonlar veritabanında verimsiz çalışabilir.
+    var anonymousTypeMappingResult = await context.Products
+       .Select(p => new
+       {
+           p.Id,
+           p.Name,
+           p.Price,
+           CategoryName = context.Categories.FirstOrDefault(c => c.Id == p.CategoryId).Name
+       })
+       .ToListAsync();
 
+    // modelview Dto
+    var modelViewDtoResult = await context.Products
+        .Select(p => new ProductDto
+        {
+            Id = p.Id,
+            Name = p.Name!,
+            Price = p.Price,
+            DiscountPrice = p.DiscountPrice,
+            Stock = p.Stock
+        }).ToListAsync();
+
+
+    // Automapper -- automapper, nesneler arasında veri transferi yapmanızı sağlayan bir kütüphanedir. Bu, veritabanı modelleriniz ile DTO’larınız arasında veri transferi yapmanızı sağlar. Automapper kullanarak, veritabanı modellerinizdeki verileri DTO’larınıza kolayca aktarabilirsiniz. Ancak, automapper kullanırken performans sorunlarına dikkat etmelisiniz, çünkü bazı durumlarda automapper verimsiz çalışabilir.
+    var products2 = await context.Products.ToListAsync();
+    var productDtoResult = ObjectMapper.Mapper.Map<List<ProductDto>>(products2);
+    // ProjectTo -- ProjectTo, automapper’ın bir özelliğidir. Bu özellik, LINQ sorgularınızda automapper kullanarak veri transferi yapmanızı sağlar. Bu, veritabanı modellerinizdeki verileri DTO’larınıza kolayca aktarabilirsiniz. Ancak, ProjectTo kullanırken performans sorunlarına dikkat etmelisiniz, çünkü bazı durumlarda ProjectTo verimsiz çalışabilir.
+    var productDtoResult2 = context.Products.ProjectTo<ProductDto>(ObjectMapper.Mapper.ConfigurationProvider).ToList();
 
 
 
