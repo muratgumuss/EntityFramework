@@ -351,6 +351,22 @@ using (var context = new AppDbContext())
     await context.Database.ExecuteSqlRawAsync("EXEC sp_insert_product @Name = {0}, @Price = {1}, @CategoryId = {2}",
         newProductName, newProductPrice, newProductCategoryId);
 
+    // function mapping -- function mapping, veritabanında tanımlı bir fonksiyonu EF Core’da kullanmanızı sağlar. Bu, veritabanında tanımlı bir fonksiyonu LINQ sorgularınızda kullanarak veri çekmenizi sağlar. Ancak, function mapping kullanırken performans sorunlarına dikkat etmelisiniz, çünkü bazı fonksiyonlar veritabanında verimsiz çalışabilir.
+    var functionMappingResult = await context.Products
+        .Where(p => EF.Functions.Like(p.Name, "%Iphone%"))
+        .ToListAsync();
+    // function table mapping -- function table mapping, veritabanında tanımlı bir fonksiyonu EF Core’da bir tablo gibi kullanmanızı sağlar. Bu, veritabanında tanımlı bir fonksiyonu LINQ sorgularınızda kullanarak veri çekmenizi sağlar. Ancak, function table mapping kullanırken performans sorunlarına dikkat etmelisiniz, çünkü bazı fonksiyonlar veritabanında verimsiz çalışabilir.
+    var functionTableMappingResult = await context.Products
+        .FromSqlRaw("SELECT * FROM dbo.GetProductsByPrice({0})", 20000)
+        .ToListAsync();
+
+    // table valued function
+    var tableValuedFunctionResult = await context.Products
+        .FromSqlRaw("SELECT * FROM dbo.GetProductsByPrice({0})", 20000)
+        .ToListAsync();
+
+    // scalar valued function -- scalar valued function, veritabanında tanımlı bir fonksiyonu EF Core’da bir değer olarak kullanmanızı sağlar. Bu, veritabanında tanımlı bir fonksiyonu LINQ sorgularınızda kullanarak veri çekmenizi sağlar. Ancak, scalar valued function kullanırken performans sorunlarına dikkat etmelisiniz, çünkü bazı fonksiyonlar veritabanında verimsiz çalışabilir.
+
 
 
 
