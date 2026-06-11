@@ -399,9 +399,99 @@ using (var context = new AppDbContext())
     // ProjectTo -- ProjectTo, automapper’ın bir özelliğidir. Bu özellik, LINQ sorgularınızda automapper kullanarak veri transferi yapmanızı sağlar. Bu, veritabanı modellerinizdeki verileri DTO’larınıza kolayca aktarabilirsiniz. Ancak, ProjectTo kullanırken performans sorunlarına dikkat etmelisiniz, çünkü bazı durumlarda ProjectTo verimsiz çalışabilir.
     var productDtoResult2 = context.Products.ProjectTo<ProductDto>(ObjectMapper.Mapper.ConfigurationProvider).ToList();
 
+    // savechanges() -- savechanges, veritabanına yapılan değişiklikleri kaydetmenizi sağlar. Bu, veritabanına yapılan ekleme, güncelleme ve silme işlemlerini kaydetmenizi sağlar. SaveChanges kullanarak, veritabanına yapılan değişiklikleri kalıcı hale getirebilirsiniz. Ancak, SaveChanges kullanırken performans sorunlarına dikkat etmelisiniz, çünkü bazı durumlarda SaveChanges verimsiz çalışabilir.
+    
+    var newProduct2 = new Product
+    {
+        Name = "Iphone 15 Pro Max",
+        Price = 30000,
+        DiscountPrice = 25000,
+        Stock = 100,
+        Barcode = 123456789,
+        CategoryId = 1
+    };
+    context.Products.Add(newProduct2);
 
+    await context.SaveChangesAsync();
+    // SaveChanges transaction yapısı -- SaveChanges, veritabanına yapılan değişiklikleri kaydetmenizi sağlar. Ancak, SaveChanges kullanırken, birden fazla değişiklik yapıyorsanız ve bu değişikliklerin tamamının başarılı bir şekilde kaydedilmesini istiyorsanız, SaveChanges transaction yapısını kullanabilirsiniz. Bu sayede, tüm değişiklikler başarılı bir şekilde kaydedilir veya hiçbir değişiklik kaydedilmez. SaveChanges transaction yapısını kullanarak, veritabanı tutarlılığını sağlayabilirsiniz.
 
+    // transaction Scope -- BeginTransaction, Commit ve Rollback metotları ile transaction yönetimi yapabilirsiniz. BeginTransaction metodu ile bir transaction başlatılır, Commit metodu ile transaction başarılı bir şekilde tamamlanır ve Rollback metodu ile transaction geri alınır. Transaction Scope kullanarak, veritabanı işlemlerinizin tutarlılığını sağlayabilirsiniz.
+    // 2 den fazla savechanges varsa begintransaction kullanarak transaction yönetimi yapabilirsiniz. Bu sayede, tüm savechanges işlemleri başarılı bir şekilde tamamlanır veya hiçbir savechanges işlemi kaydedilmez. Transaction Scope kullanarak, veritabanı işlemlerinizin tutarlılığını sağlayabilirsiniz.
 
+    // begintransaction örneği
+    using (var transaction = await context.Database.BeginTransactionAsync())
+    {
+        try
+        {
+            var newProduct3 = new Product
+            {
+                Name = "Iphone 15 Pro Max",
+                Price = 30000,
+                DiscountPrice = 25000,
+                Stock = 100,
+                Barcode = 123456789,
+                CategoryId = 1
+            };
+            context.Products.Add(newProduct3);
+            await context.SaveChangesAsync();
+            var newProduct4 = new Product
+            {
+                Name = "Macbook Pro M2",
+                Price = 40000,
+                DiscountPrice = 35000,
+                Stock = 50,
+                Barcode = 987654321,
+                CategoryId = 1
+            };
+            context.Products.Add(newProduct4);
+            await context.SaveChangesAsync();
+            await transaction.CommitAsync();
+        }
+        catch (Exception)
+        {
+            await transaction.RollbackAsync();
+        }
 
+        // 2.ci örnek 
+
+        using var transaction2 = await context.Database.BeginTransactionAsync();
+
+        try
+        {
+            var newProduct3 = new Product
+            {
+                Name = "Iphone 15 Pro Max",
+                Price = 30000,
+                DiscountPrice = 25000,
+                Stock = 100,
+                Barcode = 123456789,
+                CategoryId = 1
+            };
+            context.Products.Add(newProduct3);
+            await context.SaveChangesAsync();
+
+            var newProduct4 = new Product
+            {
+                Name = "Macbook Pro M2",
+                Price = 40000,
+                DiscountPrice = 35000,
+                Stock = 50,
+                Barcode = 987654321,
+                CategoryId = 1
+            };
+            context.Products.Add(newProduct4);
+            await context.SaveChangesAsync();
+
+            // Her şey başarılıysa commit et
+            await transaction.CommitAsync();
+        }
+        catch (Exception)
+        {
+            // Burada Rollback yazmanıza GEREK YOKTUR.
+            // Hata fırlatıldığında using bloğu bitecek,
+            // transaction dispose edilecek ve otomatik rollback gerçekleşecektir.
+            throw;
+        }
+    }
 
 }
