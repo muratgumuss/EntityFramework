@@ -494,4 +494,63 @@ using (var context = new AppDbContext())
         }
     }
 
+    // Isolation level -- isolation level, transaction’ların birbirleriyle nasıl etkileşime gireceğini belirleyen bir kavramdır. Isolation level, transaction’ların birbirlerini nasıl göreceğini ve birbirlerini nasıl etkileyebileceğini belirler. EF Core’da isolation level’ı yönetmek için, BeginTransaction metoduna isolation level parametresi verebilirsiniz. Bu sayede, transaction’larınızın birbirleriyle nasıl etkileşime gireceğini belirleyebilirsiniz.
+    // Read uncommitted isolation level -- read uncommitted isolation level, bir transaction’ın diğer transaction’ların henüz commit edilmemiş verilerini okuyabilmesini sağlar. Bu, dirty read olarak da bilinir. Read uncommitted isolation level kullanarak, transaction’larınızın birbirlerini nasıl etkileyebileceğini belirleyebilirsiniz.
+    // Read uncommitted isolation level kullanarak transaction başlatmak için, BeginTransaction metoduna isolation level parametresi verebilirsiniz. Örneğin:
+    // Read uncommitted örneği
+    using (var transaction = await context.Database.BeginTransactionAsync(System.Data.IsolationLevel.ReadUncommitted))
+    {
+        // Transaction işlemleri burada
+        var products3 = await context.Products.FirstAsync();
+        products3.Stock = 100;
+        context.SaveChanges();
+        transaction.Commit();
+        
+    }
+
+    // Read committed isolation level -- read committed isolation level, bir transaction’ın diğer transaction’ların commit edilmiş verilerini okuyabilmesini sağlar. Bu, non-repeatable read olarak da bilinir. Read committed isolation level kullanarak, transaction’larınızın birbirlerini nasıl etkileyebileceğini belirleyebilirsiniz.
+    // Read committed isolation level kullanarak transaction başlatmak için, BeginTransaction metoduna isolation level parametresi verebilirsiniz. Örneğin:
+    using (var transaction = await context.Database.BeginTransactionAsync(System.Data.IsolationLevel.ReadCommitted))
+    {
+        // Transaction işlemleri burada
+        var products3 = await context.Products.FirstAsync();
+        products3.Stock = 100;
+        context.SaveChanges();
+        transaction.Commit();
+    }
+
+    // Repeatable read isolation level -- repeatable read isolation level, bir transaction’ın diğer transaction’ların commit edilmiş verilerini okuyabilmesini sağlar ve aynı veriyi tekrar okuduğunda aynı sonucu almasını sağlar. Bu, phantom read olarak da bilinir. Repeatable read isolation level kullanarak, transaction’larınızın birbirlerini nasıl etkileyebileceğini belirleyebilirsiniz.
+    // Repeatable read isolation level kullanarak transaction başlatmak için, BeginTransaction metoduna isolation level parametresi verebilirsiniz. Örneğin:
+    // Read committed vs repeatable read -- read committed isolation level, bir transaction’ın diğer transaction’ların commit edilmiş verilerini okuyabilmesini sağlar. Ancak, aynı veriyi tekrar okuduğunda farklı sonuçlar alabilir. Repeatable read isolation level ise, bir transaction’ın diğer transaction’ların commit edilmiş verilerini okuyabilmesini sağlar ve aynı veriyi tekrar okuduğunda aynı sonucu almasını sağlar. Bu nedenle, repeatable read isolation level, read committed isolation level’dan daha yüksek bir izolasyon seviyesidir.
+    using (var transaction = await context.Database.BeginTransactionAsync(System.Data.IsolationLevel.RepeatableRead))
+    {
+        // Transaction işlemleri burada
+        var products3 = await context.Products.FirstAsync();
+        products3.Stock = 100;
+        context.SaveChanges();
+        transaction.Commit();
+    }
+
+    // Serializable isolation level -- serializable isolation level, bir transaction’ın diğer transaction’ların commit edilmiş verilerini okuyabilmesini sağlar ve aynı veriyi tekrar okuduğunda aynı sonucu almasını sağlar. Ayrıca, bu izolasyon seviyesi, bir transaction’ın diğer transaction’ların commit edilmiş verilerini okuyabilmesini sağlar ve aynı veriyi tekrar okuduğunda aynı sonucu almasını sağlar. Bu nedenle, serializable isolation level, repeatable read isolation level’dan daha yüksek bir izolasyon seviyesidir.
+    // Serializable isolation level kullanarak transaction başlatmak için, BeginTransaction metoduna isolation level parametresi verebilirsiniz. Örneğin:
+    // serializable vs repeatable read -- serializable isolation level, bir transaction’ın diğer transaction’ların commit edilmiş verilerini okuyabilmesini sağlar ve aynı veriyi tekrar okuduğunda aynı sonucu almasını sağlar. Ayrıca, bu izolasyon seviyesi, bir transaction’ın diğer transaction’ların commit edilmiş verilerini okuyabilmesini sağlar ve aynı veriyi tekrar okuduğunda aynı sonucu almasını sağlar. Bu nedenle, serializable isolation level, repeatable read isolation level’dan daha yüksek bir izolasyon seviyesidir. Ancak, serializable isolation level kullanırken performans sorunlarına dikkat etmelisiniz, çünkü bu izolasyon seviyesi veritabanında daha fazla kilitlenmeye neden olabilir.
+    using (var transaction = await context.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable))
+    {
+        // Transaction işlemleri burada
+        var products3 = await context.Products.FirstAsync();
+        products3.Stock = 100;
+        context.SaveChanges();
+        transaction.Commit();
+    }
+
+    // Snapshot isolation level -- snapshot isolation level, bir transaction’ın diğer transaction’ların commit edilmiş verilerini okuyabilmesini sağlar ve aynı veriyi tekrar okuduğunda aynı sonucu almasını sağlar. Ayrıca, bu izolasyon seviyesi, bir transaction’ın diğer transaction’ların commit edilmiş verilerini okuyabilmesini sağlar ve aynı veriyi tekrar okuduğunda aynı sonucu almasını sağlar. Bu nedenle, snapshot isolation level, serializable isolation level’dan daha yüksek bir izolasyon seviyesidir. Ancak, snapshot isolation level kullanırken performans sorunlarına dikkat etmelisiniz, çünkü bu izolasyon seviyesi veritabanında daha fazla kaynak tüketebilir.
+    // Snapshot isolation level kullanarak transaction başlatmak için, BeginTransaction metoduna isolation level parametresi verebilirsiniz. Örneğin:
+    using (var transaction = await context.Database.BeginTransactionAsync(System.Data.IsolationLevel.Snapshot))
+    {
+        // Transaction işlemleri burada
+        var products3 = await context.Products.FirstAsync();
+        products3.Stock = 100;
+        context.SaveChanges();
+        transaction.Commit();
+    }
 }
