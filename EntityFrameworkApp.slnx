@@ -1,4 +1,5 @@
 <Solution>
+  <Project Path="Concurrency.Web/Concurrency.Web.csproj" Id="dc43dfb0-ada9-49d5-8ca3-ceab4a87d160" />
   <Project Path="EFCore.CodeFirst/EFCore.CodeFirst.csproj" Id="3eae172c-8668-44cd-998c-771318d59251" />
   <Project Path="EFCore.DatabaseFirst/EFCore.DatabaseFirst.csproj" />
   <Project Path="EFCore.DatabaseFirstByScaffold/EFCore.DatabaseFirstByScaffold.csproj" Id="82bfab01-4a1c-40c9-ab62-2805b3c47170" />
